@@ -4,6 +4,22 @@ Package that compiles AsciiMath-HTML to complete, searchable websites. (with SVG
 
 ### Disclaimer: This package ain't your all purpose, general package. This is niched against a fixed folder structure and fixed document structures. Be aware, and look at the examples for success.
 
+### Disclaimer 2: This package isn't published yet to npm, so to install do
+```bash
+git clone https://github.com/MrYakobo/matte-engine
+cd matte-engine
+# CLI:
+npm link --local
+# module usage
+npm link
+cd /other/project
+npm link matte-engine
+```
+
+### Disclaimer 3: The name `matte-engine` is totally stupid and should be renamed. It's the main reason I havn't published to npm yet.
+
+---
+
 This package exposes a function and a CLI.
 
 ### module usage
@@ -11,7 +27,7 @@ This package exposes a function and a CLI.
 
 ```js
 async function main(){
-    var compile = require('matte-engine')
+    var compile = require('matte-engine').compile
     await compile('matte/flervariabelanalys')
     console.log('Profit')
 }
@@ -28,9 +44,11 @@ matte-engine matte/flervariabelanalys
 
 ## Conventions
 
+#### Note: You don't really have to care about the folder structure if you're using the CLI to init your projects, and then dumping the root-folder at a web server. Just sayin
+
 ### Uncompiled file structure:
 ```
-signaler/
+project/
 ├── src
 │   ├── boilerplate.html
 │   ├── fl1.html
@@ -41,7 +59,7 @@ Note the convention of namespacing the files `src/fl*.html`. The boilerplate is 
 
 #### Compiled file structure:
 ```
-signaler/
+project/
 ├── data.js
 ├── fl1.html
 ├── index.html
@@ -76,12 +94,3 @@ The package should create these files after compilation:
 ```
 
 This setup ensures that you are able to use `live-server` to live preview your changes to this file.
-
-## Goals
-
-Init script should set up a workspace for you. `matte-engine init`
-
-You should be able to just `matte-engine` away, and then dump the files on a web server.
-Development should be easy and straightforward.
-
-Maybe: Expose a (very light wrapper around live-server) dev server to avoid using different tools.
