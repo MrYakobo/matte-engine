@@ -80,10 +80,8 @@ var searchfix = 'function b(h){if(""!==location.hash){var a=location.hash.split(
     fs.writeFileSync(path.join(folder, 'data.js'), 'var data = ' + JSON.stringify(globData))
     fs.writeFileSync(path.join(folder, 'hashes.json'), JSON.stringify(oldHashes))
 
-    //TODO: compile index.html for project
     var source = fs.readFileSync(path.join(__dirname, 'boilerplate', 'index.html'), 'utf8')
     var ctx = {title: path.basename(path.resolve(folder)), files: globData}
-    console.log(source)
     fs.writeFileSync(path.join(folder, 'index.html'), Handlebars.compile(source)(ctx))
 }
 
