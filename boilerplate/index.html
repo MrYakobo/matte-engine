@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+    a{
+        display: table;
+        margin: auto;
+    }
+    </style>
+</head>
+
+<body>
+    <h1>{{title}}</h1>
+
+    <input onkeydown="keydown(event)" type="text" id="input" placeholder="Sök efter kunskap..."><button onclick="search()">Sök</button>
+    <div id="results"></div>
+    <br>
+    <br>
+    {{#each files}}
+        <a href="{{this}}">Föreläsning {{@index}}</a>
+    {{/each}}
+</body>
+<script src="data.js"></script>
+<script>
+    function keydown(e){
+        if(e.key == 'Enter') search()
+    }
+    var fuse = {search: function(str){
+        //empty search = empty result
+        if(str === '') return []
+
+        var results = []
+        data.forEach((o)=>{
+            var i = o.content.toLowerCase().indexOf(str.toLowerCase())
+            if(i > -1){
+                results.push({item: o, indices: [i, i+str.length-1]})
+            }
+        })
+        return results
+    }}
+
+    function search() {
+        var searchString = document.getElementById('input').value
+        var res = fuse.search(searchString)
+        var html = ""
+        res.forEach((x) => {
+            html += '<a href="' + x.item.file + '#'+ searchString +'">' + x.item.display + '</a> '
+                
+            var d = 25
+            var o = x.indices
+            var before = x.item.content.substring(o[0]-d, o[0]) 
+            var bold = x.item.content.substring(o[0], o[1]+1) 
+            var after = x.item.content.substring(o[1]+1, o[1]+d)
+            html += '...' + before + '<b>' + bold + '</b>' + after + '...'
+            html += '<br>'
+        })
+        if(html == ""){
+            html = 'Inga resultat...'
+        }
+        document.getElementById('results').innerHTML = html
+    }
+    if(document.getElementById('input').value != ""){
+        search()
+    }
+</script>
+
+</html>

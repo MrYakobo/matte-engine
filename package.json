@@ -1,0 +1,26 @@
+{
+  "name": "matte-engine",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "matte-engine": "cli/matte-engine.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "checksum": "^0.1.1",
+    "cheerio": "^1.0.0-rc.2",
+    "commander": "^2.11.0",
+    "fs-extra": "^4.0.2",
+    "glob": "^7.1.2",
+    "glob-promise": "^3.2.0",
+    "handlebars": "^4.0.11",
+    "mathjax-node-page": "^1.4.1",
+    "yesno": "0.0.1"
+  }
+}
