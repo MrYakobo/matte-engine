@@ -23,11 +23,11 @@ function display(str){
 }
 
 module.exports.init = async function(folder){
-    await fs.copy(__dirname + '/boilerplate', folder)
-    var _path = path.join(folder, 'boilerplate', 'index.html')
-    var source = fs.readFileSync(_path)
+    await fs.copy(__dirname + '/boilerplate', path.resolve(folder))
+    var _path = path.join(folder, 'index.html')
+    var source = fs.readFileSync(_path, 'utf8')
     var ctx = {title: path.basename(folder), files: []}
-    fs.writeFileSync(_path ,Handlebars.compile(source)(ctx))
+    fs.writeFileSync(_path, Handlebars.compile(source)(ctx))
 }
 
 module.exports.compile = async function(folder){
@@ -52,22 +52,25 @@ module.exports.compile = async function(folder){
 var searchfix = 'function b(h){if(""!==location.hash){var a=location.hash.split("#")[1];find(a)}}window.onhashchange=b,b()' 
 
     for(var i = 0; i < files.length; i++){
+
+        var input = fs.readFileSync(files[i], 'utf8')
+
+        //save contents of this file (plaintext) to globData
+        globData.push({file: path.basename(files[i]),display: display(path.basename(files[i])),content:getData(input)})
+
         //if hash is the same as last time, skip file
         var cs = checksum(input)
-        if(cs === oldHashes[i]) continue
+        if(cs === oldHashes[i]) {
+            console.log('info: ' + files[i] + ': file not changed, therefore not compiling')
+            continue
+        }
 
         oldHashes[i] = cs
-
-        var input = fs.readFileSync(files[i])
-
         //remove mathjax script, escape `''`
         input = input.replace(/<script src=".*mathjax.*/g, '').replace(/''/g, `^&#x2033;`).replace('</body>',`</body><script>${searchfix}</script>`)
 
         //compile asciimath to svg (heavy operation):
         var output = await mjPromise(input)
-
-        //save contents of this file (plaintext) to globData
-        globData.push({file: path.basename(files[i]),display: display(path.basename(files[i])),content:getData(input)})
 
         //save output
         fs.writeFileSync(path.join(path.dirname(path.dirname(files[i])), path.basename(files[i])), output)
@@ -78,10 +81,10 @@ var searchfix = 'function b(h){if(""!==location.hash){var a=location.hash.split(
     fs.writeFileSync(path.join(folder, 'hashes.json'), JSON.stringify(oldHashes))
 
     //TODO: compile index.html for project
-    var _path = path.join(folder, 'boilerplate', 'index.html')
-    var source = fs.readFileSync(_path)
-    var ctx = {title: path.basename(folder), files: []}
-    fs.writeFileSync(_path, Handlebars.compile(source)(ctx))
+    var source = fs.readFileSync(path.join(__dirname, 'boilerplate', 'index.html'), 'utf8')
+    var ctx = {title: path.basename(path.resolve(folder)), files: globData}
+    console.log(source)
+    fs.writeFileSync(path.join(folder, 'index.html'), Handlebars.compile(source)(ctx))
 }
 
 function mjPromise(input){

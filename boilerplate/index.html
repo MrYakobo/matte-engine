@@ -21,8 +21,8 @@
     <div id="results"></div>
     <br>
     <br>
-    {{#each files}}
-        <a href="{{this}}">Föreläsning {{@index}}</a>
+    {{#each}}
+        <a href="{{this.file}}">{{this.display}}</a>
     {{/each}}
 </body>
 <script src="data.js"></script>

@@ -8,7 +8,7 @@ var main = require('..')
 program
 .version(JSON.parse(fs.readFileSync(path.join(__dirname, '../','package.json'),'utf8')).version)
 .usage('<command> [dir]')
-.command('compile [dir]', 'compile directory for web')
-.command('init [dir]', 'initialize matte-engine\'s folder structure in specified directory', {isDefault: true})
+.command('compile [dir]', 'compile directory for web', {isDefault: true})
+.command('init [dir]', 'initialize matte-engine\'s folder structure in specified directory')
 
 program.parse(process.argv);
