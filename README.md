@@ -45,7 +45,6 @@ signaler/
 ├── data.js
 ├── fl1.html
 ├── index.html
-├── searchfix.js
 ├── src
 │   ├── boilerplate.html
 │   ├── fl1.html
@@ -56,7 +55,6 @@ The package should create these files after compilation:
     `data.js`: File containing search information about files
     `fl*.html`: `src/fl*.html` but with SVG-graphics instead
     `index.html`: Index for site
-    `searchfix.js`: Search functionality (to be merged with `data.js`)
 
 ### fl*.html
 
