@@ -10,5 +10,6 @@ program
 .usage('<command> [dir]')
 .command('compile [dir]', 'compile directory for web', {isDefault: true})
 .command('init [dir]', 'initialize matte-engine\'s folder structure in specified directory')
+.command('dev [dir]', 'start a web server that compiles when files are changed.')
 
 program.parse(process.argv);

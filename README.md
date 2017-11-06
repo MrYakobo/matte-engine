@@ -71,7 +71,7 @@ project/
 
 The package should create these files after compilation:
     `data.js`: File containing search information about files
-    `fl*.html`: `src/fl*.html` but with SVG-graphics instead
+    `fl*.html`: `src/fl*.html` but with pre-rendered SVG graphics instead of AsciiMath
     `index.html`: Index for site
 
 ### fl*.html
