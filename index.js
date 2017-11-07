@@ -67,8 +67,8 @@ var minify = require('html-minify').minify
 async function compileAM(input) {
     var searchfix = 'function b(h){if(""!==location.hash){var a=location.hash.split("#")[1];find(a)}}window.onhashchange=b,b()'
 
-    //remove mathjax script, escape `''`
-    input = input.replace(/<script src=".*mathjax.*/g, '').replace(/''/g, `^&#x2033;`).replace('</body>', `</body><script>${searchfix}</script>`)
+    //remove mathjax script, escape `''`, insert search highlighting script, remap ../style.css to style.css
+    input = input.replace(/<script src=".*mathjax.*/g, '').replace(/''/g, `^&#x2033;`).replace('</body>', `</body><script>${searchfix}</script>`).replace('../style.css','style.css')
 
     //compile asciimath to svg (heavy operation):
     return minify(await mjPromise(input))
