@@ -2,10 +2,14 @@ var mjpage = require('mathjax-node-page').mjpage
 var fs = require('fs-extra')
 var path = require('path')
 const cheerio = require('cheerio')
-var path = require('path')
 var checksum = require('checksum')
 var glob = require('glob-promise')
 var Handlebars = require('handlebars')
+var minify = require('html-minify').minify
+var watch = require('watch').watchTree
+var liveServer = require('live-server')
+
+var ora = require('ora')
 
 function numsort(a, b) {
     let reg = /(\d+)/
@@ -21,9 +25,6 @@ function getData(input) {
 function display(str) {
     return `Föreläsning ${parseInt(str.replace(/\D/g,''))}`
 }
-
-var watch = require('watch').watchTree
-var liveServer = require('live-server')
 
 module.exports.server = function (folder) {
     watch(folder, (f, curr, prev) => {
@@ -62,7 +63,6 @@ async function compileFile(file){
     var out = await compileAM(fs.readFileSync(file))
     fs.writeFileSync(file ,out)
 }
-var minify = require('html-minify').minify
 
 async function compileAM(input) {
     var searchfix = 'function b(h){if(""!==location.hash){var a=location.hash.split("#")[1];find(a)}}window.onhashchange=b,b()'
@@ -100,8 +100,9 @@ async function compile(folder, force) {
         }
     }
 
+    const spinner = ora('Compiling files...')
     for (var i = 0; i < files.length; i++) {
-
+        spinner.start('Compiling files...')
         var input = fs.readFileSync(files[i], 'utf8')
 
         //save contents of this file (plaintext) to globData
@@ -114,15 +115,17 @@ async function compile(folder, force) {
         //if hash is the same as last time, skip file
         var cs = checksum(input)
         if (cs === oldHashes[i]) {
-            console.log('info: ' + files[i] + ': file not changed, therefore not compiling')
+            spinner.info(files[i] + ': file not changed, therefore not compiling')
             continue
         }
 
         oldHashes[i] = cs
 
         var output = await compileAM(input)
+        var outfile = path.join(path.dirname(path.dirname(files[i])), path.basename(files[i]))
         //save output
-        fs.writeFileSync(path.join(path.dirname(path.dirname(files[i])), path.basename(files[i])), output)
+        fs.writeFileSync(outfile, output)
+        spinner.succeed(files[i] + ' compiled to ' + outfile)
     }
 
     //save data.js and hashes
