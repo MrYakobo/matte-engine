@@ -3,21 +3,6 @@
 Package that compiles AsciiMath-HTML to complete, searchable websites. (with SVG-graphics)
 
 ### Disclaimer: This package ain't your all purpose, general package. This is niched against a fixed folder structure and fixed document structures. Be aware, and look at the examples for success.
-
-### Disclaimer 2: This package isn't published yet to npm, so to install do
-```bash
-git clone https://github.com/MrYakobo/matte-engine
-cd matte-engine
-# CLI:
-npm link --local
-# module usage
-npm link
-cd /other/project
-npm link matte-engine
-```
-
-### Disclaimer 3: The name `matte-engine` is totally stupid and should be renamed. It's the main reason I havn't published to npm yet.
-
 ---
 
 This package exposes a function and a CLI.
