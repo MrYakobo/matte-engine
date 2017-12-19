@@ -71,7 +71,14 @@ async function compileAM(input) {
     input = input.replace(/<script src=".*mathjax.*/g, '').replace(/''/g, `^&#x2033;`).replace('</body>', `</body><script>${searchfix}</script>`).replace('../style.css','style.css')
 
     //compile asciimath to svg (heavy operation):
-    return minify(await mjPromise(input))
+    var str = await mjPromise(input)
+    try{
+        var minified = minify(str)
+        return minified
+    }
+    catch(er){
+        return str
+    }
 }
 
 async function compile(folder, force) {
