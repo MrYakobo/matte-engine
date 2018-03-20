@@ -40,7 +40,7 @@ project/
 └── style.css
 ```
 
-Note the convention of namespacing the files `src/fl*.html`. The boilerplate is there for practical reasons only, in case you need to take notes quickly (ie `cp boilerplate.html fl4.html && vim fl4.html`).
+Note the convention of namespacing the files `src/fl*.html`. The boilerplate is there for practical reasons only, in case you need to take notes quickly (ie `cp boilerplate.html fl4.html && vim fl4.html`). If you're using markdown to take your notes, there is no need for a boilerplate (the head is appended programmatically)
 
 #### Compiled file structure:
 ```

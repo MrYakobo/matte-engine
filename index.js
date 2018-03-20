@@ -8,6 +8,10 @@ var Handlebars = require('handlebars')
 var minify = require('html-minify').minify
 var watch = require('watch').watchTree
 var liveServer = require('live-server')
+const showdown = require('showdown')
+const md = new showdown.Converter({
+    simpleLineBreaks: true
+})
 
 var ora = require('ora')
 
@@ -64,14 +68,30 @@ async function compileFile(file){
     fs.writeFileSync(file ,out)
 }
 
-async function compileAM(input) {
+async function compileAM({input, isHTML, title} = {input: '', isHTML: false, title: 'fl'}) {
+    if(isHTML){
     var searchfix = 'function b(h){if(""!==location.hash){var a=location.hash.split("#")[1];find(a)}}window.onhashchange=b,b()'
-
     //remove mathjax script, escape `''`, insert search highlighting script, remap ../style.css to style.css
-    input = input.replace(/<script src=".*mathjax.*/g, '').replace(/''/g, `^&#x2033;`).replace('</body>', `</body><script>${searchfix}</script>`).replace('../style.css','style.css')
-
+    input = input
+            .replace(/<script src=".*mathjax.*/g, '')
+            .replace(/''/g, `^&#x2033;`)
+            .replace('../style.css','style.css')
+    }
+    else {
+        const $ = cheerio.load(`<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${title}</title><link rel="stylesheet" href="style.css"></head><body class="markdown">${input}</body>`)
+        
+        const nodes = $('p:contains("`")').contents().toArray() //unpack <p>`foo`bar</p> to `foo`<p>bar</p>.
+        const unpack = nodes.filter(t=> t.data != null && t.data.indexOf('\\`')>-1)
+        unpack.forEach(t=> {
+            const math = /\\`(.+?)\\`/.exec(t.data)
+            $(t).text(t.data.replace(math, '')) //remove math from element
+            $(t.parentNode).before(math) //add math as a seperate text node before <p>.
+        })
+        input = $.html()
+    }
     //compile asciimath to svg (heavy operation):
     var str = await mjPromise(input)
+    str = str.replace('</body>', `</body><script>${searchfix}</script>`)
     try{
         var minified = minify(str)
         return minified
@@ -90,7 +110,7 @@ async function compile(folder, force) {
     }
 
     //get files in requested folder (src):
-    var files = await glob(path.join(folder, 'src', 'fl*.html'))
+    var files = await glob(path.join(folder, 'src', 'fl*'))
     //sort'em
     files = files.sort(numsort)
 
@@ -112,9 +132,11 @@ async function compile(folder, force) {
         spinner.start('Compiling files...')
         var input = fs.readFileSync(files[i], 'utf8')
 
+        let ext = path.extname(files[i]).toLowerCase()
         //save contents of this file (plaintext) to globData
+        const file = path.basename(files[i]).replace(ext, '.html')
         globData.push({
-            file: path.basename(files[i]),
+            file: file,
             display: display(path.basename(files[i])),
             content: getData(input)
         })
@@ -127,9 +149,17 @@ async function compile(folder, force) {
         }
 
         oldHashes[i] = cs
+        if(ext == '.md' || ext == '.markdown'){
+            const escaped = input.replace(/`(.+?)`/g,'\\`$1\\`')
+            input = md.makeHtml(escaped)
+        } else if(ext != '.html') {
+            spinner.info(files[i] + ' is not markdown or html, skipping')
+            continue
+        }
+        
+        const output = await compileAM({input: input, isHTML: ext == '.html', title: file.replace('.html', '')})
 
-        var output = await compileAM(input)
-        var outfile = path.join(path.dirname(path.dirname(files[i])), path.basename(files[i]))
+        var outfile = path.join(path.dirname(path.dirname(files[i])), file)
         //save output
         fs.writeFileSync(outfile, output)
         spinner.succeed(files[i] + ' compiled to ' + outfile)
